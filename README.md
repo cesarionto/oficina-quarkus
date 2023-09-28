@@ -94,19 +94,19 @@ Para criar uma API REST com o Quarkus usando o https://code.quarkus.io/, você p
 6. Inicie o PostgreSQL usando Docker (se você ainda não o fez):
 
 ```
-
 docker run --name postgresql -e POSTGRES_PASSWORD=postgres -d -p 5432:5432 postgres
 
 docker exec -it postgresql psql -U postgres
 
 CREATE DATABASE secitec;
+
 \c secitec;
 
 CREATE TABLE item (id SERIAL PRIMARY KEY, nome VARCHAR(255), descricao TEXT);
 
-insert into item (id, nome, descricao) VALUES (1, 'Cafe', 'Um cafezinho bacana.');
+insert into item (nome, descricao) VALUES ('Cafe', 'Um cafezinho bacana.');
 
-alter sequence myentity_seq restart with 2;
+insert into item (nome, descricao) VALUES ('Agua', 'Amana, o patrocinador!');
 
 \q
 ```
