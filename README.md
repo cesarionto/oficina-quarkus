@@ -29,9 +29,6 @@ Para criar uma API REST com o Quarkus usando o https://code.quarkus.io/, você p
 
    @Entity
    public class Item extends PanacheEntity{
-       @Id
-       @GeneratedValue(strategy = GenerationType.IDENTITY)
-       public Long id;
        public String nome;
        public String descricao;
    }
