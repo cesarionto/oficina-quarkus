@@ -24,9 +24,8 @@ Para criar uma API REST com o Quarkus usando o https://code.quarkus.io/, você p
 4. Crie uma entidade JPA (Java Persistence API) para representar os itens que você deseja armazenar no banco de dados. Por exemplo, crie uma classe chamada `Item`:
 
    ```java
-   
-import javax.persistence.Entity;
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
+   import javax.persistence.Entity;
+   import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
    @Entity
    public class Item extends PanacheEntity{
