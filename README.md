@@ -40,26 +40,32 @@ Para criar uma API REST com o Quarkus usando o https://code.quarkus.io/, você p
 5. Crie um recurso REST para manipular esses itens. Por exemplo, crie uma classe `ItemResource`:
 
    ```java
-   import java.util.List;
-   import jakarta.transaction.Transactional;
-   import jakarta.ws.rs.Consumes;
-   import jakarta.ws.rs.DELETE;
-   import jakarta.ws.rs.GET;
-   import jakarta.ws.rs.POST;
-   import jakarta.ws.rs.PUT;
-   import jakarta.ws.rs.Path;
-   import jakarta.ws.rs.PathParam;
-   import jakarta.ws.rs.Produces;
-   import jakarta.ws.rs.core.MediaType;
+    import jakarta.transaction.Transactional;
+    import jakarta.ws.rs.Consumes;
+    import jakarta.ws.rs.DELETE;
+    import jakarta.ws.rs.GET;
+    import jakarta.ws.rs.POST;
+    import jakarta.ws.rs.PUT;
+    import jakarta.ws.rs.Path;
+    import jakarta.ws.rs.PathParam;
+    import jakarta.ws.rs.Produces;
+    import jakarta.ws.rs.core.MediaType;
+    import java.util.List;
 
-   @Path("/itens")
-   @Produces(MediaType.APPLICATION_JSON)
-   @Consumes(MediaType.APPLICATION_JSON)
-   public class ItemResource {
+    @Path("/itens")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public class ItemResource {
 
-   @GET
+    @GET
     public List<Item> listar() {
         return Item.listAll();
+    }
+
+    @GET
+    @Path("/{id}")
+    public Item getItemPorId(@PathParam("id") Long id) {
+        return Item.findById(id);
     }
 
     @POST
@@ -74,8 +80,8 @@ Para criar uma API REST com o Quarkus usando o https://code.quarkus.io/, você p
     public void atualizar(@PathParam("id") Long id, Item item) {
         Item entity = Item.findById(id);
         if (entity != null) {
-            entity.nome = item.nome;
-            entity.descricao = item.descricao;
+        entity.nome = item.nome;
+        entity.descricao = item.descricao;
         }
     }
 
@@ -85,10 +91,11 @@ Para criar uma API REST com o Quarkus usando o https://code.quarkus.io/, você p
     public void deletar(@PathParam("id") Long id) {
         Item entity = Item.findById(id);
         if (entity != null) {
-            entity.delete();
+        entity.delete();
         }
     }
-   }
+    }
+
    ```
 
 6. Inicie o PostgreSQL usando Docker (se você ainda não o fez):
@@ -107,6 +114,8 @@ CREATE TABLE item (id SERIAL PRIMARY KEY, nome VARCHAR(255), descricao TEXT);
 insert into item (nome, descricao) VALUES ('Cafe', 'Um cafezinho bacana.');
 
 insert into item (nome, descricao) VALUES ('Agua', 'Amana, o patrocinador!');
+
+ALTER SEQUENCE item_seq RESTART WITH 3;
 
 \q
 ```
@@ -133,9 +142,10 @@ Para testar o CRUD via REST usando o `curl`, execute na linha de comando:
 
     curl -X GET http://localhost:8080/itens/1
 
+    ### ATENÇAO! Vai dar pau!
     curl -X POST -H "Content-Type: application/json" -d '{
-    "nome": "Nome do Item",
-    "descricao": "Descrição do Item"
+    "nome": "Um bebida misteriosa",
+    "descricao": "Provavelmente levemente altamente alcoolica"
     }' http://localhost:8080/itens
 
     curl -X PUT -H "Content-Type: application/json" -d '{
