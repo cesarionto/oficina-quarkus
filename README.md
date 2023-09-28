@@ -41,11 +41,10 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 5. Crie um recurso REST para manipular esses itens. Por exemplo, crie uma classe `ItemResource`:
 
    ```java
-
-import java.util.List;
-import javax.inject.Inject;
-import javax.ws.rs.*;
-import javax.transaction.Transactional;
+   import java.util.List;
+   import javax.inject.Inject;
+   import javax.ws.rs.*;
+   import javax.transaction.Transactional;
 
    @Path("/itens")
    @Produces(MediaType.APPLICATION_JSON)
