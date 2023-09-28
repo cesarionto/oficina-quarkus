@@ -127,6 +127,24 @@ insert into item (nome, descricao) VALUES ('Agua', 'Amana, o patrocinador!');
 
 Lembre-se de substituir as informações de configuração do banco de dados (URL, usuário e senha) de acordo com suas configurações específicas do PostgreSQL. Este é um exemplo básico de como criar uma API RESTful com Quarkus e PostgreSQL. Você pode personalizar e expandir conforme suas necessidades específicas.
 
+Para testar o CRUD via REST usando o `curl`, execute na linha de comando:
+
+    curl -X GET http://localhost:8080/itens
+
+    curl -X GET http://localhost:8080/itens/1
+
+    curl -X POST -H "Content-Type: application/json" -d '{
+    "nome": "Nome do Item",
+    "descricao": "Descrição do Item"
+    }' http://localhost:8080/itens
+
+    curl -X PUT -H "Content-Type: application/json" -d '{
+    "nome": "Um novo cafezis!",
+    "descricao": "Modificando o cafezis!"
+    }' http://localhost:8080/itens/1
+
+    curl -X DELETE http://localhost:8080/itens/1
+
 ## Executando em Container
 
 Para compilar e executar a aplicação Quarkus em um contêiner Docker localmente, siga os passos abaixo:
