@@ -101,7 +101,8 @@ Para criar uma API REST com o Quarkus usando o https://code.quarkus.io/, você p
 6. Inicie o PostgreSQL usando Docker (se você ainda não o fez):
 
 ```
-docker run --name postgresql -e POSTGRES_PASSWORD=postgres -d -p 5432:5432 postgres
+docker run -d -it -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_HOST_AUTH_METHOD=trust --name postgresql postgres
+
 
 docker exec -it postgresql psql -U postgres
 
@@ -195,7 +196,7 @@ A imagem deve aparecer ao fazer:
 6. Após a conclusão da criação da imagem Docker, você pode executar um contêiner com a aplicação Quarkus usando o seguinte comando:
 
    ```
-   docker run --rm -d -p 8080:8080 --name secitec_container xico/secitec
+   docker run -d -it -p 8080:8080 --name secitec_container "xico/secitec"
    ```
 
 7. Sua aplicação Quarkus agora estará em execução em um contêiner Docker localmente e estará acessível em `http://localhost:8080`.
