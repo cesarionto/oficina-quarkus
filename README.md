@@ -1,12 +1,14 @@
+## Criando a Aplicação
+
 Para criar uma API REST com o Quarkus usando o https://code.quarkus.io/, você pode seguir os passos a seguir. Certifique-se de ter o Docker instalado em sua máquina para configurar o PostgreSQL como banco de dados.
 
 1. Acesse o https://code.quarkus.io/ e siga estas etapas:
 
    a. Selecione as extensões necessárias para sua aplicação. Para criar uma API REST com o PostgreSQL, você precisará selecionar as seguintes extensões:
-   
-      - RESTEasy (para suporte a REST)
-      - Hibernate ORM with Panache (para persistência de dados)
-      - PostgreSQL (para suporte ao banco de dados PostgreSQL)
+
+   - RESTEasy (para suporte a REST)
+   - Hibernate ORM with Panache (para persistência de dados)
+   - PostgreSQL (para suporte ao banco de dados PostgreSQL)
 
    b. Clique em "Generate your application" para baixar o projeto gerado.
 
@@ -15,10 +17,11 @@ Para criar uma API REST com o Quarkus usando o https://code.quarkus.io/, você p
 3. Configure o banco de dados PostgreSQL no arquivo `src/main/resources/application.properties`. Altere as configurações de banco de dados para se adequar às suas credenciais e preferências. Um exemplo de configuração:
 
    ```
-   quarkus.datasource.jdbc.url=jdbc:postgresql://localhost:5432/seu_banco_de_dados
-   quarkus.datasource.username=seu_usuario
-   quarkus.datasource.password=sua_senha
    quarkus.hibernate-orm.database.generation=update
+   quarkus.datasource.jdbc.url=jdbc:postgresql://localhost:5432/secitec
+   quarkus.datasource.db-kind=postgresql
+   quarkus.datasource.username=postgres
+   quarkus.datasource.password=postgres
    ```
 
 4. Crie uma entidade JPA (Java Persistence API) para representar os itens que você deseja armazenar no banco de dados. Por exemplo, crie uma classe chamada `Item`:
@@ -38,64 +41,93 @@ Para criar uma API REST com o Quarkus usando o https://code.quarkus.io/, você p
 
    ```java
    import java.util.List;
-   import javax.inject.Inject;
-   import javax.ws.rs.*;
-   import javax.transaction.Transactional;
+   import jakarta.transaction.Transactional;
+   import jakarta.ws.rs.Consumes;
+   import jakarta.ws.rs.DELETE;
+   import jakarta.ws.rs.GET;
+   import jakarta.ws.rs.POST;
+   import jakarta.ws.rs.PUT;
+   import jakarta.ws.rs.Path;
+   import jakarta.ws.rs.PathParam;
+   import jakarta.ws.rs.Produces;
+   import jakarta.ws.rs.core.MediaType;
 
    @Path("/itens")
    @Produces(MediaType.APPLICATION_JSON)
    @Consumes(MediaType.APPLICATION_JSON)
    public class ItemResource {
 
-       @GET
-       public List<Item> listar() {
-           return Item.listAll();
-       }
+   @GET
+    public List<Item> listar() {
+        return Item.listAll();
+    }
 
-       @POST
-       @Transactional
-       public void salvar(Item item) {
-           item.persist();
-       }
+    @POST
+    @Transactional
+    public void salvar(Item item) {
+        item.persist();
+    }
 
-       @PUT
-       @Path("/{id}")
-       @Transactional
-       public void atualizar(@PathParam("id") Long id, Item item) {
-           Item entity = Item.findById(id);
-           if (entity != null) {
-               entity.nome = item.nome;
-               entity.descricao = item.descricao;
-           }
-       }
+    @PUT
+    @Path("/{id}")
+    @Transactional
+    public void atualizar(@PathParam("id") Long id, Item item) {
+        Item entity = Item.findById(id);
+        if (entity != null) {
+            entity.nome = item.nome;
+            entity.descricao = item.descricao;
+        }
+    }
 
-       @DELETE
-       @Path("/{id}")
-       @Transactional
-       public void deletar(@PathParam("id") Long id) {
-           Item entity = Item.findById(id);
-           if (entity != null) {
-               entity.delete();
-           }
-       }
+    @DELETE
+    @Path("/{id}")
+    @Transactional
+    public void deletar(@PathParam("id") Long id) {
+        Item entity = Item.findById(id);
+        if (entity != null) {
+            entity.delete();
+        }
+    }
    }
    ```
 
 6. Inicie o PostgreSQL usando Docker (se você ainda não o fez):
 
-   ```
-   docker run --name postgres -e POSTGRES_PASSWORD=sua_senha -d -p 5432:5432 postgres
-   ```
+```
 
-7. Compile e execute sua aplicação Quarkus:
+docker run --name postgresql -e POSTGRES_PASSWORD=postgres -d -p 5432:5432 postgres
 
-   ```
-   ./mvnw compile quarkus:dev
-   ```
+docker exec -it postgresql psql -U postgres
+
+CREATE DATABASE secitec;
+\c secitec;
+
+CREATE TABLE item (id SERIAL PRIMARY KEY, nome VARCHAR(255), descricao TEXT);
+
+insert into item (id, nome, descricao) VALUES (1, 'Cafe', 'Um cafezinho bacana.');
+
+alter sequence myentity_seq restart with 2;
+
+\q
+```
+
+7. Adicione a extensao jackson para cuspir JSON:
+
+```
+./mvnw quarkus:add-extensions -Dextensions="io.quarkus:quarkus-resteasy-jackson"
+```
+
+8. Compile e execute sua aplicação Quarkus:
+
+```
+./mvnw compile quarkus:dev
+```
 
 8. Sua API REST estará acessível em `http://localhost:8080/itens`. Você pode usar ferramentas como `curl`, `Postman` ou `Insomnia` para testar os endpoints CRUD (Create, Read, Update, Delete) para itens no banco de dados.
 
 Lembre-se de substituir as informações de configuração do banco de dados (URL, usuário e senha) de acordo com suas configurações específicas do PostgreSQL. Este é um exemplo básico de como criar uma API RESTful com Quarkus e PostgreSQL. Você pode personalizar e expandir conforme suas necessidades específicas.
+
+## Executando em Container
 
 Para compilar e executar a aplicação Quarkus em um contêiner Docker localmente, siga os passos abaixo:
 
@@ -105,25 +137,27 @@ Para compilar e executar a aplicação Quarkus em um contêiner Docker localment
 
 3. Compile sua aplicação Quarkus usando o comando Maven Wrapper (que está incluído por padrão no projeto Quarkus):
 
-   ```
-   ./mvnw clean package
-   ```
+```
 
-   Isso irá criar um arquivo JAR executável da sua aplicação no diretório `target`.
+./mvnw clean package
+
+```
+
+Isso irá criar um arquivo JAR executável da sua aplicação no diretório `target`.
 
 4. Agora, você precisa criar um arquivo Dockerfile para criar uma imagem Docker da sua aplicação Quarkus. Crie um arquivo chamado `Dockerfile` no diretório raiz do seu projeto com o seguinte conteúdo:
 
-   ```Dockerfile
-   FROM adoptopenjdk/openjdk11:alpine-jre
-   WORKDIR /opt/app
+```Dockerfile
+FROM adoptopenjdk/openjdk11:alpine-jre
+WORKDIR /opt/app
 
-   COPY target/*-runner.jar app.jar
+COPY target/*-runner.jar app.jar
 
-   EXPOSE 8080
-   CMD ["java", "-jar", "app.jar"]
-   ```
+EXPOSE 8080
+CMD ["java", "-jar", "app.jar"]
+```
 
-   Esse Dockerfile usa uma imagem base do OpenJDK 11 e copia o JAR executável gerado durante a compilação para dentro do contêiner.
+Esse Dockerfile usa uma imagem base do OpenJDK 11 e copia o JAR executável gerado durante a compilação para dentro do contêiner.
 
 5. Agora, você pode criar a imagem Docker da sua aplicação Quarkus. No terminal, navegue até o diretório do projeto (onde o Dockerfile está localizado) e execute o seguinte comando:
 
